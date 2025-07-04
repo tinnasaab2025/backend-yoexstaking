@@ -72,25 +72,13 @@ export const uploadFilesWithCloudinary = async (document) => {
     let ImageDate = await cloudinary.uploader.upload(
       document,
       { resource_type: "image" },
-      function (error, result) {}
+      function (error, result) { }
     );
     return ImageDate.secure_url;
   } catch (err) {
     throw err;
   }
 };
-
-export const generatePassword = () => {
-  var length = 6,
-    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-    retVal = "";
-  for (var i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-};
-
-
 
 
 
@@ -104,11 +92,11 @@ export const generateUniqueUserId = async () => {
     userId = 'YEX' + Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
 
     // Check if the user ID already exists in the database
-  const attribute = {
+    const attribute = {
       include: ['id']
     }
-    const criteria = {user_id:userId};
-    exists = await getOne(criteria,attribute);
+    const criteria = { user_id: userId };
+    exists = await getOne(criteria, attribute);
 
   } while (exists); // Repeat if the ID exists
 
@@ -123,17 +111,17 @@ export const handleErrorMessage = (res, error) => {
     .status(ERROR.somethingWentWrong.statusCode)
     .json({ ...ERROR.somethingWentWrong, statusMessage: error.message });
 };
-export const handleSuccess = (res,object) => {
-   if (object.count > 0) {
-        let finalMessage = {};
-        finalMessage = { ...SUCCESS.found };
-        finalMessage.data = object.rows;
-        finalMessage.totalCount = object.count;
-        return res.status(SUCCESS.found.statusCode).json(finalMessage);
-      } else {
-        let finalMessage = {};
-        finalMessage = { ...ERROR.dataNotFound };
-        finalMessage.data = [];
-        return res.status(ERROR.error.statusCode).json(finalMessage);
-      }
+export const handleSuccess = (res, object) => {
+  if (object.count > 0) {
+    let finalMessage = {};
+    finalMessage = { ...SUCCESS.found };
+    finalMessage.data = object.rows;
+    finalMessage.totalCount = object.count;
+    return res.status(SUCCESS.found.statusCode).json(finalMessage);
+  } else {
+    let finalMessage = {};
+    finalMessage = { ...ERROR.dataNotFound };
+    finalMessage.data = [];
+    return res.status(ERROR.error.statusCode).json(finalMessage);
+  }
 }

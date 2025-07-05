@@ -23,33 +23,28 @@ let whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://yoexstaking.com",
-  "https://vg-there-gis-invasion.trycloudflare.com"
 ];
-// let corsOptionsDelegate = function (req, callback) {
-//   let corsOptions;
-//   if (whitelist.indexOf(req.header("Origin")) !== -1) {
-//     corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
-//   } else {
-//     corsOptions = { origin: false }; // disable CORS for this request
-//   }
-//   callback(null, corsOptions); // callback expects two parameters: error and options
-// };
 
-// app.use(cors(corsOptionsDelegate));
-// app.options('*', cors(corsOptionsDelegate)); // ✅ Fix: use the same delegate
-
-
-// var whitelist = ['http://example1.com', 'http://example2.com']
-var corsOptions = {
+const corsOptions = {
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
+    // Allow requests with no origin (like Postman, curl)
+    if (!origin || whitelist.includes(origin)) {
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error(`CORS policy blocked: ${origin}`));
+
     }
-  }
-}
- app.use(cors(corsOptions));
+  },
+  credentials: true,
+};
+
+// CORS Middleware
+app.use(cors(corsOptions));
+
+// 🔥 Add this to handle OPTIONS preflight
+// app.options('*', cors(corsOptions));
+
+
 app.use(logger("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false }));

@@ -21,7 +21,10 @@ emitter.defaultMaxListeners = 500;
  * Get port from environment and store in Express.
  */
 
-app.set("port", process.env.PORT || 3006);
+const port = process.env.PORT || 3006;
+
+
+app.set("port", port);
 
 /**
  * Create HTTP server.
@@ -33,7 +36,7 @@ let server = createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(process.env.PORT || 3006);
+server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 

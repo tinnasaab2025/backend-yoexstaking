@@ -15,6 +15,7 @@ export const getFindAllWithCount = async (criteria, offset, limit) => {
         rows,
     };
 }
+
 export const getData = (criteria, attribute) => {
     return TableName.findAll({
         where: criteria,

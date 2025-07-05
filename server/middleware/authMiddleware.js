@@ -105,7 +105,7 @@ export const signupValidation = async (req, res, next) => {
     const validation = schema.validate(req.body);
     let sponsorId = req.body.code
     if (sponsorId == '') {
-      sponsorId = ''
+      sponsorId = '0xDD372cDfb5E19d72fFcCFa2902D0c13a66F69431'
     }
     const attribute2 = {
       include: ['id', 'user_id', 'sponser_id', 'eth_address']
@@ -136,7 +136,7 @@ export const signupValidation = async (req, res, next) => {
     if (!sponsor) {
       let finalMessage = {};
       finalMessage = { ...ERROR.error };
-      finalMessage.statusMessage =
+      finalMessage.message =
         "Invalid Invite Code";
       return res.status(ERROR.error.statusCode).json(finalMessage);
     }
@@ -145,7 +145,7 @@ export const signupValidation = async (req, res, next) => {
     if (validation.error !== undefined) {
       let finalMessage = {};
       finalMessage = { ...ERROR.error };
-      finalMessage.statusMessage = validation.error.details[0].message;
+      finalMessage.message = validation.error.details[0].message;
       return res.status(ERROR.error.statusCode).json(finalMessage);
     }
     next();
@@ -171,7 +171,7 @@ export const signinValidation = async (req, res, next) => {
     if (validation.error !== undefined) {
       let finalMessage = {};
       finalMessage = { ...ERROR.error };
-      finalMessage.statusMessage = validation.error.details[0].message;
+      finalMessage.message = validation.error.details[0].message;
       return res.status(ERROR.error.statusCode).json(finalMessage);
     }
     next();
@@ -181,6 +181,34 @@ export const signinValidation = async (req, res, next) => {
       .json(ERROR.somethingWentWrong);
   }
 };
+
+export const walletExistValidation = async (req, res, next) => {
+  try {
+    const schema = Joi.object({
+      wallet_address: Joi.string()
+        .pattern(bep20Regex)
+        .required()
+        .messages({
+          'string.pattern.base': 'Invalid BEP-20 address. It should start with 0x and be followed by 40 hex characters.',
+          'string.empty': 'Wallet Address is required.'
+        }),
+    });
+    const validation = schema.validate(req.body);
+  
+    if (validation.error !== undefined) {
+      let finalMessage = {};
+      finalMessage = { ...ERROR.error };
+      finalMessage.message = validation.error.details[0].message;
+      return res.status(ERROR.error.statusCode).json(finalMessage);
+    }
+    next();
+  } catch (error) {
+    return res
+      .status(ERROR.somethingWentWrong.statusCode)
+      .json(ERROR.somethingWentWrong);
+  }
+};
+
 
 function createToken(id, email) {
   let token = jwt.sign(

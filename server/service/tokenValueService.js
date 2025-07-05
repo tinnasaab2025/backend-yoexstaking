@@ -1,11 +1,10 @@
-import { User as TableName } from "../models/Users.js";
+import { TokenPrice as TableName } from "../models/TokenPrice.js";
 
 export const InsertData = (object) => {
     return TableName.create(object);
 }
 
-
-export const getFindAllWithCount = async(criteria, offset, limit) => {
+export const getFindAllWithCount = async (criteria, offset, limit) => {
     const { count, rows } = await TableName.findAndCountAll({
         where: criteria,
         offset: offset,
@@ -16,6 +15,7 @@ export const getFindAllWithCount = async(criteria, offset, limit) => {
         rows,
     };
 }
+
 export const getData = (criteria, attribute) => {
     return TableName.findAll({
         where: criteria,
@@ -27,12 +27,10 @@ export const findById = (id) => {
     return TableName.findByPk(id);
 }
 
-export const getOne = (criteria, attribute) => {
+export const getOne = (criteria) => {
     return TableName.findOne({
         where: criteria,
-        attributes: attribute,
-        raw: true,
-        nest: true,
+         raw: true,
     });
 }
 
@@ -57,4 +55,8 @@ export const count = (criteria) => {
 
 export const incrementData = (fields, criteria) => {
     return TableName.increment(fields, criteria);
+}
+
+export const getSum = (fieldname, criteria) => {
+    return TableName.sum(fieldname, criteria);
 }

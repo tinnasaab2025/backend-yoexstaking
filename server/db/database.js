@@ -1,24 +1,26 @@
 import { Sequelize } from 'sequelize';
 
-
-// Option 3: Passing parameters separately (other dialects)
- export const sequelize = new Sequelize('yoyo', 'root', '', {
+// ✅ Assign the instance to a variable
+export const sequelize = new Sequelize('yoex', 'root', '', {
   host: 'localhost',
-  dialect: 'mysql', // one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle',
- port: 3306, // 3306
+  port: 3306, // or 3307 if your XAMPP uses that
+  dialect: 'mysql',
+  logging: false,
+  // dialectOptions: {
+  //   ssl: {
+  //     require: true,
+  //     rejectUnauthorized: false, // Accept self-signed certs (for testing)
+  //   }
+  // },
 });
+// ✅ Test connection
+const checkConnection = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Database connection has been established successfully.');
+  } catch (error) {
+    console.error('❌ Unable to connect to the database:');
+  }
+};
 
-
-
-
-// // Test the connection
-// const checkConnection = async () => {
-//   try {
-//     await sequelize.authenticate(); // This tries to connect to the DB
-//     console.log('Connection has been established successfully.');
-//   } catch (error) {
-//     console.error('Unable to connect to the database:', error);
-//   }
-// };
-
-// checkConnection();
+checkConnection();

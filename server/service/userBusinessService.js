@@ -1,4 +1,4 @@
-import { User as TableName } from "../models/Users.js";
+import { UserBusiness as TableName } from "../models/UserBusiness.js";
 
 export const InsertData = (object) => {
     return TableName.create(object);

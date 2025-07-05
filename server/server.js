@@ -21,7 +21,9 @@ var app = express();
 
 let whitelist = [
   "http://localhost:3000",
-  "http://localhost:3001",];
+  "http://localhost:3001",
+  "https://vg-there-gis-invasion.trycloudflare.com"
+];
 let corsOptionsDelegate = function (req, callback) {
   let corsOptions;
   if (whitelist.indexOf(req.header("Origin")) !== -1) {

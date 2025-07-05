@@ -22,10 +22,9 @@ export const User = sequelize.define('User', {
   sponser_eth_address: {
     type: DataTypes.STRING
   },
-  directs: {
-    type: DataTypes.INTEGER
-  }
-,
+   upline_id: {
+    type: DataTypes.STRING
+  },
   master_key: {
     type: DataTypes.STRING
   },
@@ -98,7 +97,13 @@ export const User = sequelize.define('User', {
   role: {
     type: DataTypes.STRING
   },
+   created_at: {
+    type: DataTypes.DATE
+  },
 
+   updated_at: {
+    type: DataTypes.DATE
+  },
 }, {
   tableName: 'tbl_users',         // 👈 Table name in your DB
   timestamps: false,           // 👈 Disable auto timestamps if you're managing them manually

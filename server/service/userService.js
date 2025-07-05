@@ -1,11 +1,11 @@
 import { User as TableName } from "../models/Users.js";
 
-export const InsertData = async (object) => {
-    return await TableName.create(object);
+export const InsertData = (object) => {
+    return TableName.create(object);
 }
 
 
-export const getFindAllWithCount = async (criteria, offset, limit) => {
+export const getFindAllWithCount = async(criteria, offset, limit) => {
     const { count, rows } = await TableName.findAndCountAll({
         where: criteria,
         offset: offset,
@@ -16,26 +16,26 @@ export const getFindAllWithCount = async (criteria, offset, limit) => {
         rows,
     };
 }
-export const getData = async (criteria, attribute) => {
-    return await TableName.findAll({
+export const getData = (criteria, attribute) => {
+    return TableName.findAll({
         where: criteria,
         attributes: attribute,
     });
 }
 
-export const findById = async (id) => {
-    return await TableName.findByPk(id);
+export const findById = (id) => {
+    return TableName.findByPk(id);
 }
 
-export const getOne = async (criteria, attribute) => {
-    return await TableName.findOne({
+export const getOne = (criteria, attribute) => {
+    return TableName.findOne({
         where: criteria,
         attributes: attribute,
     });
 }
 
-export const updateData = async (criteria, object) => {
-    return await TableName.update(
+export const updateData = (criteria, object) => {
+    return TableName.update(
         object,
         {
             where: criteria,
@@ -43,16 +43,16 @@ export const updateData = async (criteria, object) => {
     );
 }
 
-export const bulkInsert = async (data) => {
-    return await TableName.bulkCreate(data);
+export const bulkInsert = (data) => {
+    return TableName.bulkCreate(data);
 }
 
-export const count = async (criteria) => {
-    return await TableName.count({
+export const count = (criteria) => {
+    return TableName.count({
         where: criteria,
     });
 }
 
-export const incrementData = async (fields, criteria) => {
-    return await TableName.increment(fields, criteria);
+export const incrementData = (fields, criteria) => {
+    return TableName.increment(fields, criteria);
 }

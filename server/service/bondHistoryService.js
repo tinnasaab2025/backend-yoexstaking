@@ -1,3 +1,4 @@
+
 import { BondHistory as TableName } from "../models/BondHistory.js";
 
 export const InsertData = (object) => {

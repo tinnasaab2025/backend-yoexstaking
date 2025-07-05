@@ -22,6 +22,7 @@ var app = express();
 let whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
+   "https://yoexstaking.com",
   "https://vg-there-gis-invasion.trycloudflare.com"
 ];
 let corsOptionsDelegate = function (req, callback) {

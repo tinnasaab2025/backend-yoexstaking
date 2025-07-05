@@ -97,22 +97,20 @@ const getResponse = (res, status, text, message) => {
 
 export const joinMalasiyaEvent = async (req, res) => {
     try {
-        const { first_name,last_name,email,wallet_address } = req.user;
-    
+        const { first_name,last_name,email,wallet_address } = req.body;
        const eventData = {
             first_name: first_name,
+            name:first_name+' '+last_name,
             last_name: last_name,
             email: email,
             wallet_address: wallet_address,
-        };  
+        }; 
+        
+        console.log('eventData',eventData)
         await InsertData(eventData)
         let finalMessage = { ...SUCCESS.created };
         finalMessage.message = 'Your Request has been received. Kindly send your passport details front,back and scanned passport size photo at support@yoex.io . We will get back to your shortly.!';
         return res.status(SUCCESS.created.statusCode).json(finalMessage);
-    
-      
-    
-       
     } catch (error) {
         handleErrorMessage(res, error);
     }

@@ -8,7 +8,7 @@ const baseURL = "/api/v1/profile/";
 
 router.get(`${baseURL}event_achiver`, eventAchiver);
 router.get(`${baseURL}lucky-users`, luckyUsers);
-router.post(`/api/v1/event/join_malasiya`,joinMalasiyaEventValidation, joinMalasiyaEvent);
+router.post(`${baseURL}event/join_malaysia`,joinMalasiyaEventValidation, joinMalasiyaEvent);
 
 
 

@@ -8,6 +8,7 @@ import logger from "morgan";
 import dotenv from "dotenv";
 dotenv.config();
 import mainRoute from "./routes/index.js";
+import { ERROR } from "./config/AppConstants.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,6 +24,7 @@ let whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://yoexstaking.com",
+  "https://vg-there-gis-invasion.trycloudflare.com"
 ];
 
 const corsOptions = {
@@ -55,7 +57,11 @@ app.use(mainRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  let finalResponse = { ...ERROR.dataNotFound };
+  finalResponse.message = 'Not found';
+  finalResponse.statusCode = 404
+  return res.status(ERROR.dataNotFound.statusCode).json(finalResponse);
+  // next(createError(404));
 });
 
 // error handler

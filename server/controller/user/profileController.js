@@ -3,6 +3,7 @@ import { Op, Sequelize } from 'sequelize';
 
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
 import { count, getOne } from "../../service/userService.js";
+import { getOne as getOneUserBusiness, getData as getDataUserBusiness } from "../../service/userBusinessService.js";
 import { getOne as getOneTokenValue } from "../../service/tokenValueService.js";
 import { count as sponsorCount } from "../../service/sponsorCountService.js";
 import { getOne as getOneEvent, InsertData } from "../../service/eventService.js";
@@ -14,6 +15,49 @@ import { getData as getDataUnBond } from '../../service/unBondHistoryService.js'
 import { getTotalBondSumByUserId, getTotalStakeSumByUserId, legTeamDownline } from '../../utils/GetTeam.js';
 
 
+
+export const assets = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    let criteria = {
+      user_id: user_id,
+    };
+    const attribute = ['disabled'];
+    const user = await getOne(criteria, attribute);
+    if (user['disabled'] === true) {
+      let finalResponse = { ...ERROR.error };
+      finalResponse.message = 'User blocked, please contact our support';
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+
+    const assets = await getOneUserBusiness({ user_id: user_id }, ['available_asset', 'total_asset', 'stake_tokens', 'total_stake_tokens', 'total_unstake_tokens', 'bond_tokens', 'total_bond_tokens', 'bond_discount_tokens', 'yoex_bond_yield', 'bond_infinity_yield_rewards', 'yield_loop_rewards', 'infinity_yield_rewards']);
+    const attributeBond = [
+      [Sequelize.fn('IFNULL', Sequelize.fn('SUM', Sequelize.col('stake_tokens')), 0), 'total_stake_tokens'],
+    ];
+    const total_stake_tokens = await getDataUserBusiness({}, attributeBond);
+
+    let response = {};
+    response['available_asset'] = assets.available_asset;
+    response['total_asset'] = assets.total_asset;
+    response['stake_tokens'] = assets.stake_tokens;
+    response['total_stake_tokens'] = assets.total_stake_tokens;
+    response['total_unstake_tokens'] = assets.total_unstake_tokens;
+    response['bond_tokens'] = assets.bond_tokens;
+    response['total_bond_tokens'] = assets.total_bond_tokens;
+    response['bond_discount_tokens'] = assets.bond_discount_tokens;
+    response['yoex_bond_yield'] = assets.yoex_bond_yield;
+    response['bond_infinity_yield_rewards'] = assets.bond_infinity_yield_rewards;
+    response['yield_loop_rewards'] = assets.yield_loop_rewards;
+    response['infinity_yield_rewards'] = assets.infinity_yield_rewards;
+    response['company_current_stake_amount'] = total_stake_tokens[0].total_stake_tokens;
+    let finalMessage = { ...SUCCESS.found };
+    finalMessage.message = 'Assets getting successfully';
+    finalMessage.data = response
+    return res.status(SUCCESS.found.statusCode).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+}
 export const userInfo = async (req, res) => {
   try {
     const { user_id } = req.user;
@@ -84,10 +128,10 @@ export const inviteHistoryTeam = async (req, res) => {
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
     const finalLevel = level ? level : null;
-    const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, false);
+    // const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, false);
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = 'Invite User history getting successfully';
-    finalMessage.data = finalResult
+    finalMessage.data = []
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);

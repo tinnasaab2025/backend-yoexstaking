@@ -1,10 +1,12 @@
 
 import express from "express";
-import { bondTerms, eventAchiver, inviteHistoryTeam, joinMalasiyaEvent, luckyUsers, overview, userInfo } from "../../controller/user/profileController.js";
+import { assets, bondTerms, eventAchiver, inviteHistoryTeam, joinMalasiyaEvent, luckyUsers, overview, userInfo } from "../../controller/user/profileController.js";
 import { joinMalasiyaEventValidation } from "../../middleware/profileMiddleware.js";
 
 const router = express.Router();
 const baseURL = "/api/v1/profile/";
+
+router.get(`/api/v1/portfolios/assets`, assets);
 
 router.get(`${baseURL}user_info`, userInfo);
 router.get(`${baseURL}overview`, overview);

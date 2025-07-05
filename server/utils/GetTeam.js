@@ -65,7 +65,7 @@ export const legTeamDownline = async (user_id, level = null, limit = 10, offset 
 export const getTotalBondSumByUserId = async (user_id) => {
   try {
     // Step 1: Get downline_ids
-    const [downlines] = await sequelize.query(
+    const downlines = await sequelize.query(
       'SELECT downline_id FROM tbl_sponser_count WHERE user_id = ?',
       { replacements: [user_id], type: sequelize.QueryTypes.SELECT }
     );
@@ -94,10 +94,11 @@ export const getTotalBondSumByUserId = async (user_id) => {
 };
 
 
+
 export const getTotalStakeSumByUserId = async (user_id) => {
   try {
     // Step 1: Get downline_ids
-    const [downlines] = await sequelize.query(
+    const downlines = await sequelize.query(
       'SELECT downline_id FROM tbl_sponser_count WHERE user_id = ?',
       { replacements: [user_id], type: sequelize.QueryTypes.SELECT }
     );
@@ -124,3 +125,4 @@ export const getTotalStakeSumByUserId = async (user_id) => {
     return 0;
   }
 };
+

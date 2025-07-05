@@ -20,9 +20,9 @@ var app = express();
 // app.use("/uploads", express.static("uploads"));
 
 let whitelist = [
+  "https://yoexstaking.com",
   "http://localhost:3000",
   "http://localhost:3001",
-   "https://yoexstaking.com",
   "https://vg-there-gis-invasion.trycloudflare.com"
 ];
 let corsOptionsDelegate = function (req, callback) {
@@ -36,6 +36,7 @@ let corsOptionsDelegate = function (req, callback) {
 };
 
 app.use(cors(corsOptionsDelegate));
+
 app.use(logger("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false }));

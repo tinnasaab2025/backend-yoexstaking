@@ -23,7 +23,7 @@ export const signin = async (req, res) => {
       let finalResponse = { ...SUCCESS.login };
       finalResponse.message = 'Success';
       finalResponse.data = {
-        token: createToken({id:user.id, user_id:user.user_id, sponser_id: user.sponser_id, wallet_address:user.wallet_address}),
+        token: createToken({id:user.id, user_id:user.user_id, sponser_id: user.sponser_id, wallet_address:user.eth_address}),
       };
       return res.status(SUCCESS.login.statusCode).json(finalResponse);
     } else {
@@ -71,7 +71,7 @@ export const signup = async (req, res) => {
       
       let finalMessage = { ...SUCCESS.created };
       finalMessage.data = {
-       token: createToken({id:result.id, user_id:result.user_id, sponser_id: result.sponser_id, wallet_address:result.wallet_address}),
+       token: createToken({id:result.id, user_id:result.user_id, sponser_id: result.sponser_id, wallet_address:result.eth_address}),
       };
       return res.status(SUCCESS.created.statusCode).json(finalMessage);
     } else {

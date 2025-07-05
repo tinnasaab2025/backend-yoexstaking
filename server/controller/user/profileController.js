@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
 import { getOne } from "../../service/userService.js";
-import { getOne as getOneEvent } from "../../service/eventService.js";
+import { getOne as getOneEvent, InsertData } from "../../service/eventService.js";
 import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
 import { getSum } from '../../service/bondHistoryService.js';
 
@@ -93,3 +93,27 @@ const getResponse = (res, status, text, message) => {
   return res.status(SUCCESS.found.statusCode).json(finalMessage);
 };
 
+
+
+export const joinMalasiyaEvent = async (req, res) => {
+    try {
+        const { first_name,last_name,email,wallet_address } = req.user;
+    
+       const eventData = {
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            wallet_address: wallet_address,
+        };  
+        await InsertData(eventData)
+        let finalMessage = { ...SUCCESS.created };
+        finalMessage.message = 'Your Request has been received. Kindly send your passport details front,back and scanned passport size photo at support@yoex.io . We will get back to your shortly.!';
+        return res.status(SUCCESS.created.statusCode).json(finalMessage);
+    
+      
+    
+       
+    } catch (error) {
+        handleErrorMessage(res, error);
+    }
+}

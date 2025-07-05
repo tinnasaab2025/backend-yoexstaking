@@ -15,7 +15,7 @@ export const signin = async (req, res) => {
 
     console.warn(criteria)
     const attribute = {
-      include: ['id', 'user_id', 'sponser_id', 'wallet_address']
+      include: ['id', 'user_id', 'sponser_id', 'eth_address']
     }
     const user = await getOne(criteria, attribute);
 

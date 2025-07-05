@@ -89,7 +89,7 @@ export const generateUniqueUserId = async () => {
   // Loop until we generate a unique user ID
   do {
     // Generate a random user ID (YEX + random number between 1,000,000 and 9,999,999)
-    userId = 'YEX' + Math.floor(Math.random() * (9999999 - 1000000 + 1)) + 1000000;
+    userId = 'YEX' + Math.floor(Math.random() * (9999999 - 1000000 + 1));
 
     // Check if the user ID already exists in the database
     const attribute = {

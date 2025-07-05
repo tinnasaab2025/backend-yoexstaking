@@ -57,21 +57,21 @@ export const checkRegister = async (req, res) => {
 
 export const signup = async (req, res) => {
   try {
-    const { code, eth_address,sponser_id } = req.body;
+    const { code, wallet_address,sponser_id } = req.body;
     let obj = {};
     obj.user_id = await generateUniqueUserId()
     obj.sponser_id = sponser_id;
     obj.sponser_eth_address = code;
     obj.password = getRandomNumber();
     obj.master_key = getRandomNumber();
-    obj.eth_address = eth_address
+    obj.eth_address = wallet_address
     
     const result = await InsertData(obj);
     if (result) {
       
       let finalMessage = { ...SUCCESS.created };
       finalMessage.data = {
-       token: createToken({id:result.id, user_id:result.user_id, sponser_id: result.sponser_id, wallet_address:result.eth_address}),
+       token: createToken({id:result.id, user_id:result.user_id, sponser_id: result.sponser_id, wallet_address:wallet_address}),
       };
       return res.status(SUCCESS.created.statusCode).json(finalMessage);
     } else {

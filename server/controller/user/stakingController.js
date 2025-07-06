@@ -198,7 +198,6 @@ export const signTransaction = async (req, res) => {
       const [userInfo, tokenPriceDB] = await Promise.all([
         getOneUserBusiness({ user_id: user_id }, [
           "user_id",
-          "eth_address",
           "available_asset",
         ]),
         getOnePrice({ id: 1 }, ["amount"]),

@@ -290,7 +290,7 @@ export const eventAchiver = async (req, res) => {
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
 
-    const bondData = await getSum('amount', {
+    const bondData = await getSumBondHistory('amount', {
       where: {
         user_id: user_id,
         lock_days: { [Op.gte]: 180 }

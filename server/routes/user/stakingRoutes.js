@@ -26,7 +26,7 @@ router.get(`${baseURL}yoex_stake_history`, yoexStakingHistory);
 
 router.get(`${baseURL2}unbond_income_history`, unbondIncomeHistory);
 
-router.get(`${baseURL}signTransaction`, signValidation, signTransaction);
-router.get(`${baseURL}remove_stale`, removeStake);
+router.post(`${baseURL}signTransaction`, signValidation, signTransaction);
+router.post(`${baseURL}remove_stale`, removeStake);
 
 export default router;

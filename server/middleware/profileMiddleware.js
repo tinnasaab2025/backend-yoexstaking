@@ -59,7 +59,7 @@ export const joinMalasiyaEventValidation = async (req, res, next) => {
 export const unBondValidation = async (req, res, next) => {
   try {
     const schema = Joi.object({
-      hash: Joi.string().required().trim().length(64),
+      hash: Joi.string().required().trim(),
     });
 
     const validation = schema.validate(req.body);

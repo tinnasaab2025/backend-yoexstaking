@@ -13,7 +13,7 @@ import {
   getOne as getOneEvent,
   InsertData,
 } from "../../service/eventService.js";
-import { getOne as getOneRankAchiver } from "../../service/businessRankAchiversService.js";
+import { getOne as getOneRankAchiver } from "../../service/rewardService.js";
 import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
 import {
   getSum,
@@ -96,7 +96,7 @@ export const assets = async (req, res) => {
 };
 export const userInfo = async (req, res) => {
   try {
-    const { user_id } = req.user;
+    const { user_id,wallet_address } = req.user;
     let criteria = {
       user_id: user_id,
     };
@@ -115,13 +115,13 @@ export const userInfo = async (req, res) => {
     const totalBond = await getTotalBondSumByUserId(user_id);
     const totalStake = await getTotalStakeSumByUserId(user_id);
 
-    const blockBontyReward = await getOneRankAchiver({ user_id: user_id }, [
-      "rank",
+    const blockBontyReward = await getOneRankAchiver({ user_id: wallet_address }, [
+      "rank_name",
     ]);
     let response = {};
     if (blockBontyReward) {
       response["rank_level"] = true;
-      response["rank_achived"] = blockBontyReward["rank"];
+      response["rank_achived"] = blockBontyReward["rank_name"];
     } else {
       response["rank_level"] = "Normal";
       response["rank_achived"] = false;
@@ -168,10 +168,10 @@ export const inviteHistoryTeam = async (req, res) => {
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
     const finalLevel = level ? level : null;
-    // const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, false);
+    const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, true);
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "Invite User history getting successfully";
-    finalMessage.data = [];
+    finalMessage.data = finalResult
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);

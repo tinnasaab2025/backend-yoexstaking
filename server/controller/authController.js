@@ -257,7 +257,8 @@ export const checkTransaction = async (req, res) => {
 
 export const unbond = async (req, res) => {
   try {
-    const { hash, user_id } = req.query;
+     const { hash } = req.body;
+     const {user_id} = req.user;
 
     const getUnBond = await getUnOneBond({ hash: hash }, ["id"]);
     if (getUnBond) {

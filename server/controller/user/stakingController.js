@@ -37,7 +37,7 @@ import { getTransactionDetails } from "../../utils/web3.js";
 import { token } from "morgan";
 const web3 = new Web3("https://bsc-dataseed.binance.org/");
 
-const checkUnstakeTransaction = async (hash, eth_address) => {
+const checkUnstakeTransaction = async (res,eth_address,hash) => {
   const response = await getTransactionDetails(hash);
   const getStake = await getOneStake({ hash: hash }, ["id"]);
   if (getStake) {
@@ -84,6 +84,8 @@ const checkUnstakeTransaction = async (hash, eth_address) => {
   }
 
   // console.warn(getUser, tokenPrice);
+  console.log('eth_address',eth_address);
+  console.log('decodedData.user',decodedData.user);
   if (eth_address.toLowerCase() !== decodedData.user.toLowerCase()) {
     return res.status(403).json({
       statusCode: 403,
@@ -106,8 +108,7 @@ export const removeStake = async (req, res) => {
       finalResponse.message = "User blocked, please contact our support";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
-
-    const checkUnstakeData = checkUnstakeTransaction(hash);
+    const checkUnstakeData = await checkUnstakeTransaction(res,user.eth_address,hash);
 
     const checkSign = await getOneSignature(
       { signature: signature, status: 2 },
@@ -125,7 +126,7 @@ export const removeStake = async (req, res) => {
       amount: checkUnstakeData.totalAmount,
       tokens: checkUnstakeData.unstakeAmount,
       hash: hash,
-      token_price: tokenPrice, // Assuming token price is not needed here
+      token_price: tokenPrice.amount, // Assuming token price is not needed here
     };
     await InsertDataUnStake(createUnstake);
     await updateSignatureData({ signature: signature }, { status: 2 });

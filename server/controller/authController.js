@@ -8,6 +8,13 @@ import {
   getOne as getOneBond,
   InsertData as InsertDataBond,
 } from "../service/bondHistoryService.js";
+
+import {
+  getOne as getOneStake,
+  InsertData as InsertDataStake,
+} from "../service/stakeGHistoryService.js";
+
+
 import {
   getOne as getOneTokenPrice,
 } from "../service/tokenValueService.js";
@@ -165,6 +172,92 @@ export const checkTra = async (req, res) => {
     };
 
     await InsertDataBond(object);
+    return res.status(200).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
+
+export const checkTransaction = async (req, res) => {
+  try {
+    const { hash } = req.query;
+    const response = await getTransactionDetails(hash);
+    const getStake = await getOneStake({ hash: hash }, ["id"]);
+    if (getStake) {
+      return res.status(200).json({
+        statusCode: 200,
+        status: true,
+        message: "Transaction already exists",
+        data: { hash: getStake.hash },
+      });
+    }
+ 
+    let decodedData = null;
+
+    response.receipt.logs.forEach((element) => {
+      const isTargetEvent =
+        element.topics[0] ===
+        "0x1449c6dd7851abc30abf37f57715f492010519147cc2652fbc38202c18a6ee90";
+
+      if (isTargetEvent) {
+        const topics = element.topics;
+
+
+        const user = web3.eth.abi.decodeParameter("address", topics[1]);
+        const usdtRaw = web3.eth.abi
+          .decodeParameter("uint256", topics[2])
+          .toString();
+        const yoexRaw = web3.eth.abi
+          .decodeParameter("uint256", topics[3])
+          .toString();
+
+        decodedData = {
+          user,
+          yoexAmount: (Number(yoexRaw) / 1e12).toString(),
+          usdtAmount: (Number(usdtRaw) / 1e18).toString(),
+        };
+      }
+    });
+
+    if (!decodedData) {
+      return res.status(404).json({
+        statusCode: 404,
+        status: false,
+        message: "BondCreated event not found in logs",
+      });
+    }
+
+    const finalMessage = {
+      statusCode: 200,
+      status: true,
+      message: "Success",
+      data: { decodedData },
+    };
+
+
+  
+    const [getUser,tokenPrice] = await Promise.all([
+      getOne(
+      { eth_address: decodedData.user.toLowerCase() },
+      ["user_id"]
+    ),
+      getOneTokenPrice(
+        { id:1 },
+        ["amount"]
+      )
+    ]);
+    const object = {
+      user_id: getUser.user_id,
+      wallet_address: decodedData.user,
+      tokens: parseFloat(decodedData.usdtAmount)/parseFloat(tokenPrice.amount), // original USDT value
+      usdt_amount: parseFloat(decodedData.usdtAmount), // YOEX received
+      hash: hash,
+      token_price: parseFloat(tokenPrice.amount), // you can set if available
+      timestamp_unix:0
+    };
+
+    await InsertDataStake(object);
+    
     return res.status(200).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);

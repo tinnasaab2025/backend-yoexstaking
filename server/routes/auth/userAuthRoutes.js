@@ -4,6 +4,7 @@ import {
   signup,
   walletExist,
   checkTra,
+  checkTransaction,
 
 } from "../../controller/authController.js";
 import express from "express";
@@ -30,6 +31,7 @@ router.post(`${baseURL}wallet_verify`, walletExistValidation, walletExist);
 router.get(`${baseURLPublic}dashboard`, dashboard);
 
 router.get(`${baseURLPublic}checkhash`, checkTra);
+router.get(`${baseURLPublic}checktransaction`, checkTransaction);
 
 // router.post(`${baseURL}checkValidationForSignup`, signupValidation2,checkRegister);
 

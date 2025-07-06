@@ -123,8 +123,8 @@ export const removeStake = async (req, res) => {
     const createUnstake = {
       user_id: user_id,
       wallet_address: checkUnstakeData.user,
-      amount: checkUnstakeData.totalAmount,
-      tokens: checkUnstakeData.unstakeAmount,
+      amount: checkUnstakeData.unstakeAmount,
+      tokens: checkUnstakeData.totalAmount,
       hash: hash,
       token_price: tokenPrice.amount, // Assuming token price is not needed here
     };

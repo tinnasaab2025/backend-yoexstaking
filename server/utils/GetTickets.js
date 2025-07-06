@@ -1,7 +1,7 @@
 import { sequelize } from '../db/database.js'; // Adjust path as needed
 
 export async function getUserTickets(userId) {
-    const [results] = await sequelize.query(
+    const results = await sequelize.query(
         `
         SELECT t.*, tp.name AS topic_name
         FROM tbl_tickets t
@@ -15,5 +15,5 @@ export async function getUserTickets(userId) {
         }
     );
 
-    return results;
+    return results; // ✅ this will return an array of ticket records
 }

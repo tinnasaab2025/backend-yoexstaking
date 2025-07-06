@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Asset as TableName } from "../models/Assets.js";
 
 export const InsertData = (object) => {
@@ -14,6 +15,23 @@ export const getFindAllWithCount = async (criteria, offset, limit) => {
         count,
         rows,
     };
+}
+
+export async function getLimitRecordsExcludeType(userId, attributes = ['*'], excludeType, limit, offset) {
+    const results = await TableName.findAll({
+        attributes: attributes[0] === '*' ? undefined : attributes,
+        where: {
+            user_id: userId,
+            type: {
+                [Op.ne]: excludeType
+            }
+        },
+        order: [['created_at', 'DESC']],
+        limit: limit,
+        offset: offset
+    });
+
+    return results.map(record => record.get({ plain: true }));
 }
 
 export const getData = (criteria, attribute) => {

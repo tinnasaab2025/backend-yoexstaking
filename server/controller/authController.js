@@ -152,7 +152,7 @@ export const checkTra = async (req, res) => {
       total_release_bond:
         parseFloat(decodedData.yoexAmount) +
         parseFloat(decodedData.bonusAmount), // default
-      token_price: 0, // you can set if available
+      token_price: parseFloat(tokenPrice.amount), // you can set if available
       lock_days: parseInt(decodedData.lockDays),
       days: 0, // default unless tracked
       unbond_id: decodedData.index ? parseInt(decodedData.index) : 0,

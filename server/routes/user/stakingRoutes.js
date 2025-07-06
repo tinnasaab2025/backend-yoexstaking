@@ -7,6 +7,7 @@ import {
   bondIncomeHistory,
   yoexStakingHistory,
   signTransaction,
+  removeStake
 } from "../../controller/user/stakingController.js";
 import { unbond } from "../../controller/authController.js";
 import { unBondValidation } from "../../middleware/profileMiddleware.js";
@@ -26,6 +27,6 @@ router.get(`${baseURL}yoex_stake_history`, yoexStakingHistory);
 router.get(`${baseURL2}unbond_income_history`, unbondIncomeHistory);
 
 router.get(`${baseURL}signTransaction`, signValidation, signTransaction);
-// router.get(`${baseURL}remove_stale`, unbondIncomeHistory);
+router.get(`${baseURL}remove_stale`, removeStake);
 
 export default router;

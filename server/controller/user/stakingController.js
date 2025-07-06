@@ -1,6 +1,5 @@
 "use strict";
-import { Op, Sequelize } from "sequelize";
-
+import Web3 from "web3";
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
 import {
   handleErrorMessage,
@@ -16,7 +15,10 @@ import { getOne } from "../../service/configrationService.js";
 import { getFindAllWithCount } from "../../service/stakeGHistoryService.js";
 import { getFindAllWithCount as getFindAllWithCountBond } from "../../service/bondHistoryService.js";
 
-import { getFindAllWithCount as getFindAllWithCountUnStake } from "../../service/unstakeHistoryService.js";
+import {
+  getFindAllWithCount as getFindAllWithCountUnStake,
+  InsertData as InsertDataUnStake,
+} from "../../service/unstakeHistoryService.js";
 import { getFindAllWithCount as getFindAllWithCountUnBond } from "../../service/unBondHistoryService.js";
 import {
   getLimitRecordsExcludeType,
@@ -26,8 +28,114 @@ import {
 import {
   getOne as getOneSignature,
   InsertData as inseretDataSigature,
+  updateData as updateSignatureData,
 } from "../../service/signatureService.js";
+
+import { getOne as getOneStake } from "../../service/stakeGHistoryService.js";
 import { getOne as getOnePrice } from "../../service/tokenValueService.js";
+import { getTransactionDetails } from "../../utils/web3.js";
+import { token } from "morgan";
+const web3 = new Web3("https://bsc-dataseed.binance.org/");
+
+const checkUnstakeTransaction = async (hash, eth_address) => {
+  const response = await getTransactionDetails(hash);
+  const getStake = await getOneStake({ hash: hash }, ["id"]);
+  if (getStake) {
+    return res.status(200).json({
+      statusCode: 200,
+      status: true,
+      message: "Transaction already exists",
+      data: { hash: getStake.hash },
+    });
+  }
+
+  let decodedData = null;
+
+  response.receipt.logs.forEach((element) => {
+    const isTargetEvent =
+      element.topics[0] ===
+      "0x7fc4727e062e336010f2c282598ef5f14facb3de68cf8195c2f23e1454b2b74e";
+
+    if (isTargetEvent) {
+      const topics = element.topics;
+
+      const user = web3.eth.abi.decodeParameter("address", topics[1]);
+      const usdtRaw = web3.eth.abi
+        .decodeParameter("uint256", topics[2])
+        .toString();
+      const yoexRaw = web3.eth.abi
+        .decodeParameter("uint256", topics[3])
+        .toString();
+
+      decodedData = {
+        user,
+        totalAmount: (Number(yoexRaw) / 1e12).toString(),
+        unstakeAmount: (Number(usdtRaw) / 1e12).toString(),
+      };
+    }
+  });
+
+  if (!decodedData) {
+    return res.status(404).json({
+      statusCode: 404,
+      status: false,
+      message: "unStake event not found in logs",
+    });
+  }
+
+  // console.warn(getUser, tokenPrice);
+  if (eth_address.toLowerCase() !== decodedData.user.toLowerCase()) {
+    return res.status(403).json({
+      statusCode: 403,
+      status: false,
+      message: "Invalid unstake request. User does not match.",
+    });
+  }
+  return decodedData;
+};
+export const removeStake = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const { hash, signature } = req.body;
+    const user = await getOneUser({ user_id: user_id }, [
+      "disabled",
+      "eth_address",
+    ]);
+    if (user["disabled"] === true) {
+      let finalResponse = { ...ERROR.error };
+      finalResponse.message = "User blocked, please contact our support";
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+
+    const checkUnstakeData = checkUnstakeTransaction(hash);
+
+    const checkSign = await getOneSignature(
+      { signature: signature, status: 2 },
+      ["signature"]
+    );
+    if (checkSign) {
+      let finalResponse = { ...SUCCESS.created };
+      finalResponse.message = "UnStake Created Successfully";
+      return res.status(SUCCESS.created.statusCode).json(finalResponse);
+    }
+    const tokenPrice = await getOnePrice({ id: 1 }, ["amount"]);
+    const createUnstake = {
+      user_id: user_id,
+      wallet_address: checkUnstakeData.user,
+      amount: checkUnstakeData.totalAmount,
+      tokens: checkUnstakeData.unstakeAmount,
+      hash: hash,
+      token_price: tokenPrice, // Assuming token price is not needed here
+    };
+    await InsertDataUnStake(createUnstake);
+    await updateSignatureData({ signature: signature }, { status: 2 });
+    let finalMessage = { ...SUCCESS.found };
+    finalMessage.message = "Stakes created successfully";
+    return res.status(SUCCESS.found.statusCode).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
 
 const callThirdPartyAPI = async (object2) => {
   const object = {

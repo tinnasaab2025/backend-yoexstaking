@@ -12,6 +12,10 @@ export const UnBondHistory = sequelize.define('UnBondHistory', {
         type: DataTypes.STRING,
         index: true,
     },
+     wallet_address: {
+        type: DataTypes.STRING,
+        index: true,
+    },
     amount: {
         type: DataTypes.DECIMAL(10, 2),
     },

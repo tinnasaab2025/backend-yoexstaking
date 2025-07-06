@@ -168,10 +168,10 @@ export const inviteHistoryTeam = async (req, res) => {
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
     const finalLevel = level ? level : null;
-    const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, true);
+    // const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, true);
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "Invite User history getting successfully";
-    finalMessage.data = finalResult
+    finalMessage.data = []
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);

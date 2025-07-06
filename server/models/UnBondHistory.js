@@ -37,6 +37,9 @@ export const UnBondHistory = sequelize.define('UnBondHistory', {
     index: {
         type: DataTypes.INTEGER,
     },
+     status: {
+        type: DataTypes.INTEGER,
+    },
     token_price: {
         type: DataTypes.DECIMAL(10,2),
     },

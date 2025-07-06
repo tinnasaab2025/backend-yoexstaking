@@ -3,7 +3,6 @@ import Web3 from "web3";
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
 import {
   handleErrorMessage,
-  handleSuccess,
 } from "../../utils/UniversalFunctions.js";
 import { getOne as getOneUser } from "../../service/userService.js";
 import {
@@ -16,6 +15,7 @@ import { getFindAllWithCount } from "../../service/stakeGHistoryService.js";
 import { getFindAllWithCount as getFindAllWithCountBond } from "../../service/bondHistoryService.js";
 
 import {
+  getOne as getOneUnStake,
   getFindAllWithCount as getFindAllWithCountUnStake,
   InsertData as InsertDataUnStake,
 } from "../../service/unstakeHistoryService.js";
@@ -37,7 +37,7 @@ import { getTransactionDetails } from "../../utils/web3.js";
 import { token } from "morgan";
 const web3 = new Web3("https://bsc-dataseed.binance.org/");
 
-const checkUnstakeTransaction = async (res,eth_address,hash) => {
+const checkUnstakeTransaction = async (res, eth_address, hash) => {
   const response = await getTransactionDetails(hash);
   const getStake = await getOneStake({ hash: hash }, ["id"]);
   if (getStake) {
@@ -84,8 +84,8 @@ const checkUnstakeTransaction = async (res,eth_address,hash) => {
   }
 
   // console.warn(getUser, tokenPrice);
-  console.log('eth_address',eth_address);
-  console.log('decodedData.user',decodedData.user);
+  console.log("eth_address", eth_address);
+  console.log("decodedData.user", decodedData.user);
   if (eth_address.toLowerCase() !== decodedData.user.toLowerCase()) {
     return res.status(403).json({
       statusCode: 403,
@@ -95,10 +95,20 @@ const checkUnstakeTransaction = async (res,eth_address,hash) => {
   }
   return decodedData;
 };
+
 export const removeStake = async (req, res) => {
   try {
     const { user_id } = req.user;
+
     const { hash, signature } = req.body;
+
+    const checkHash = await getOneUnStake({ hash: hash }, ["id"]);
+    if (checkHash) {
+      let finalResponse = { ...ERROR.error }; 
+      finalResponse.message = "UnStake already exists";
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+
     const user = await getOneUser({ user_id: user_id }, [
       "disabled",
       "eth_address",
@@ -108,7 +118,11 @@ export const removeStake = async (req, res) => {
       finalResponse.message = "User blocked, please contact our support";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
-    const checkUnstakeData = await checkUnstakeTransaction(res,user.eth_address,hash);
+    const checkUnstakeData = await checkUnstakeTransaction(
+      res,
+      user.eth_address,
+      hash
+    );
 
     const checkSign = await getOneSignature(
       { signature: signature, status: 2 },
@@ -131,11 +145,11 @@ export const removeStake = async (req, res) => {
     await InsertDataUnStake(createUnstake);
     await updateSignatureData({ signature: signature }, { status: 2 });
     let finalMessage = { ...SUCCESS.found };
-    finalMessage.message = "Stakes created successfully";
+    finalMessage.message = "UnStake created successfully";
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);
-  }
+  } 
 };
 
 const callThirdPartyAPI = async (object2) => {

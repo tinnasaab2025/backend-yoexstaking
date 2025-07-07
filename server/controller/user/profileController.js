@@ -182,7 +182,7 @@ export const inviteHistoryTeam = async (req, res) => {
       finalResponse.message = "User blocked, please contact our support";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
-    const finalLevel = level ? level : null;
+    const finalLevel = level ? level : 0;
     const finalResult = await callThirdPartyAPI(user_id, finalLevel, skip, limit);
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "Invite User history getting successfully";

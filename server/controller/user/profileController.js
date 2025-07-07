@@ -96,7 +96,7 @@ export const assets = async (req, res) => {
 };
 export const userInfo = async (req, res) => {
   try {
-    const { user_id,wallet_address } = req.user;
+    const { user_id, wallet_address } = req.user;
     let criteria = {
       user_id: user_id,
     };
@@ -115,9 +115,10 @@ export const userInfo = async (req, res) => {
     const totalBond = await getTotalBondSumByUserId(user_id);
     const totalStake = await getTotalStakeSumByUserId(user_id);
 
-    const blockBontyReward = await getOneRankAchiver({ user_id: wallet_address }, [
-      "rank_name",
-    ]);
+    const blockBontyReward = await getOneRankAchiver(
+      { user_id: wallet_address },
+      ["rank_name"]
+    );
     let response = {};
     if (blockBontyReward) {
       response["rank_level"] = true;
@@ -153,6 +154,20 @@ export const userInfo = async (req, res) => {
   }
 };
 
+const callThirdPartyAPI = async (userId, level, skip, limit) => {
+  const apiUrl = `https://game4you.online/User/invite_history_team/${userId}/${level}/${limit}/${skip}`;
+  // console.log("API URL:", apiUrl);
+  const response = await fetch(apiUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 export const inviteHistoryTeam = async (req, res) => {
   try {
     const { user_id } = req.user;
@@ -168,10 +183,10 @@ export const inviteHistoryTeam = async (req, res) => {
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
     const finalLevel = level ? level : null;
-    // const finalResult = await legTeamDownline(user_id, finalLevel, limit, skip, true);
+    const finalResult = await callThirdPartyAPI(user_id, finalLevel, skip, limit);
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "Invite User history getting successfully";
-    finalMessage.data = []
+    finalMessage.data = finalResult?.data ? finalResult.data : [];
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);

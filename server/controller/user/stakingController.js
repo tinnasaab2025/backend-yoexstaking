@@ -110,6 +110,7 @@ export const createParticipate = async (req, res) => {
       finalResponse.message = "User blocked, please contact our support";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
+    let decodedData = null;
     const response = await getTransactionDetails(hash);
     response.receipt.logs.forEach((element) => {
       const isTargetEvent =
@@ -158,6 +159,7 @@ export const createParticipate = async (req, res) => {
       usdt_amount: parseFloat(decodedData.usdtAmount),
       hash: hash,
       token_price: tokenPrice.amount, // Assuming token price is not needed here
+      timestamp_unix: 0,
     };
     await insertDataStake(object);
     let finalMessage = { ...SUCCESS.found };

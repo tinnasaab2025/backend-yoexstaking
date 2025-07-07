@@ -357,8 +357,8 @@ export const unbond = async (req, res) => {
 
     if (inseretDataUnBond) {
       await updateBondData(
-        { user_id: user_id },
-        { unbond_id: parseInt(decodedData.index) || 0, status: 1 }
+        { user_id: user_id,unbond_id: parseInt(decodedData.index) || 0 },
+        { status: 1 }
       );
     }
 

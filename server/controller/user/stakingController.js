@@ -1,9 +1,7 @@
 "use strict";
 import Web3 from "web3";
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
-import {
-  handleErrorMessage,
-} from "../../utils/UniversalFunctions.js";
+import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
 import { getOne as getOneUser } from "../../service/userService.js";
 import {
   getOne as getOneUserBusiness,
@@ -31,7 +29,10 @@ import {
   updateData as updateSignatureData,
 } from "../../service/signatureService.js";
 
-import { getOne as getOneStake } from "../../service/stakeGHistoryService.js";
+import {
+  getOne as getOneStake,
+  InsertData as insertDataStake,
+} from "../../service/stakeGHistoryService.js";
 import { getOne as getOnePrice } from "../../service/tokenValueService.js";
 import { getTransactionDetails } from "../../utils/web3.js";
 import { token } from "morgan";
@@ -96,6 +97,84 @@ const checkUnstakeTransaction = async (res, eth_address, hash) => {
   return decodedData;
 };
 
+export const createParticipate = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    const { hash } = req.body;
+    const user = await getOneUser({ user_id: user_id }, [
+      "disabled",
+      "eth_address",
+    ]);
+    if (user["disabled"] === true) {
+      let finalResponse = { ...ERROR.error };
+      finalResponse.message = "User blocked, please contact our support";
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+    const response = await getTransactionDetails(hash);
+    response.receipt.logs.forEach((element) => {
+      const isTargetEvent =
+        element.topics[0] ===
+        "0x1449c6dd7851abc30abf37f57715f492010519147cc2652fbc38202c18a6ee90";
+
+      if (isTargetEvent) {
+        const topics = element.topics;
+
+        const user = web3.eth.abi.decodeParameter("address", topics[1]);
+        const usdtRaw = web3.eth.abi
+          .decodeParameter("uint256", topics[2])
+          .toString();
+        const yoexRaw = web3.eth.abi
+          .decodeParameter("uint256", topics[3])
+          .toString();
+
+        decodedData = {
+          user,
+          yoexAmount: (Number(yoexRaw) / 1e12).toString(),
+          usdtAmount: (Number(usdtRaw) / 1e18).toString(),
+        };
+      }
+    });
+
+    if (!decodedData) {
+      return res.status(404).json({
+        statusCode: 404,
+        status: false,
+        message: "participateCreated event not found in logs",
+      });
+    }
+
+    if (user.eth_address.toLowerCase() !== decodedData.user.toLowerCase()) {
+      return res.status(403).json({
+        statusCode: 403,
+        status: false,
+        message: "Invalid participate request. User does not match.",
+      });
+    }
+    const tokenPrice = await getOnePrice({ id: 1 }, ["amount"]);
+    const object = {
+      user_id: user_id,
+      wallet_address: decodedData.user.toLowerCase(), // Assuming eth_address is the wallet address
+      tokens: parseFloat(decodedData.yoexAmount),
+      usdt_amount: parseFloat(decodedData.usdtAmount),
+      hash: hash,
+      token_price: tokenPrice.amount, // Assuming token price is not needed here
+    };
+    await insertDataStake(object);
+    let finalMessage = { ...SUCCESS.found };
+    finalMessage.message = "Participate created successfully";
+    finalMessage.data = {
+      wallet_address: decodedData.user.toLowerCase(),
+      tokens: parseFloat(decodedData.yoexAmount),
+      usdt_amount: parseFloat(decodedData.usdtAmount),
+      hash: hash,
+      token_price: tokenPrice.amount, // Assuming token price is not needed here
+    };
+    return res.status(SUCCESS.found.statusCode).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
+
 export const removeStake = async (req, res) => {
   try {
     const { user_id } = req.user;
@@ -104,7 +183,7 @@ export const removeStake = async (req, res) => {
 
     const checkHash = await getOneUnStake({ hash: hash }, ["id"]);
     if (checkHash) {
-      let finalResponse = { ...ERROR.error }; 
+      let finalResponse = { ...ERROR.error };
       finalResponse.message = "UnStake already exists";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
@@ -149,7 +228,7 @@ export const removeStake = async (req, res) => {
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);
-  } 
+  }
 };
 
 const callThirdPartyAPI = async (object2) => {

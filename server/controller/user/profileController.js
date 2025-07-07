@@ -155,7 +155,7 @@ export const userInfo = async (req, res) => {
 };
 
 const callThirdPartyAPI = async (userId, level, skip, limit) => {
-  const apiUrl = `https://game4you.online/User/invite_history_team/${userId}/${level}/${limit}/${skip}`;
+  const apiUrl = `http://44.206.93.162/game4you.online/index.php/User/invite_history_team/${userId}/${level}/${limit}/${skip}`;
   // console.log("API URL:", apiUrl);
   const response = await fetch(apiUrl, {
     method: "GET",

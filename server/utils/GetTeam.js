@@ -76,8 +76,8 @@ export const getTotalBondSumByUserId = async (user_id) => {
 
     // Step 2: Sum total_bond from tbl_bond_history
     const [sumResult] = await sequelize.query(
-      `SELECT SUM(total_bond) AS total_bond 
-       FROM tbl_bond_history 
+      `SELECT sum(bond_tokens) AS total_bond 
+       FROM tbl_users_business 
        WHERE user_id IN (:downline_ids)`,
       {
         replacements: { downline_ids },
@@ -109,8 +109,8 @@ export const getTotalStakeSumByUserId = async (user_id) => {
 
     // Step 2: Sum tokens from tbl_stake_history
     const [sumResult] = await sequelize.query(
-      `SELECT SUM(tokens) AS total_tokens 
-       FROM tbl_stake_history 
+      `SELECT sum(stake_tokens) AS total_tokens 
+       FROM tbl_users_business 
        WHERE user_id IN (:downline_ids)`,
       {
         replacements: { downline_ids },

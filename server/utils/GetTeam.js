@@ -109,7 +109,7 @@ export const getTotalStakeSumByUserId = async (user_id) => {
 
     // Step 2: Sum tokens from tbl_stake_history
     const [sumResult] = await sequelize.query(
-      `SELECT sum(stake_tokens) AS total_tokens 
+      `SELECT sum(available_asset) AS total_tokens 
        FROM tbl_users_business 
        WHERE user_id IN (:downline_ids)`,
       {

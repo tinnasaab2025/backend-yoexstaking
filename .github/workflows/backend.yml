@@ -1,0 +1,31 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Copy Latest Code from GitHub to Server
+        run: |
+          rsync -avh --exclude='.git' ./ /var/www/html/api.yoexstaking.io
+
+      - name: Install Dependencies
+        run: |
+          cd /var/www/html/api.yoexstaking.io
+          npm install
+
+      - name: Restart Application with PM2
+        run: |
+          pm2 restart 0
+

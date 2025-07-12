@@ -1,0 +1,3 @@
+[submodule "external/backend-yoexstaking"]
+	path = external/backend-yoexstaking
+	url = https://github.com/tinnasaab2025/backend-yoexstaking.git

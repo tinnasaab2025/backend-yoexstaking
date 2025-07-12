@@ -1,9 +1,71 @@
 "use strict";
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
-import { InsertData } from "../../service/ticketService.js";
+import { InsertData, updateData } from "../../service/ticketService.js";
 import { getData } from "../../service/topicService.js";
-import { getUserTickets } from "../../utils/GetTickets.js";
+import { addReply, getReplies, getTicket, getUserTickets } from "../../utils/GetTickets.js";
 import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
+
+
+export const getViewSinglePost = async (req, res) => {
+  try {
+    const { ticket_id } = req.query;
+    if (!ticket_id) {
+      return res.status(ERROR.error.statusCode).json(ERROR.error);
+    }
+    const ticket = await getTicket(ticket_id);
+    if (!ticket) {
+      return res.status(ERROR.dataNotFound.statusCode).json(ERROR.dataNotFound);
+    }
+    const replies = await getReplies(ticket_id);
+
+    const finalRsult = {
+      ticket: ticket[0],
+      replies: replies,
+    }
+    let finalMessage = { ...SUCCESS.found };
+    finalMessage.message = "Ticket fetched successfully";
+    finalMessage.data = finalRsult;
+    return res.status(SUCCESS.found.statusCode).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
+
+
+export const postReply = async (req, res) => {
+  try {
+    const { ticket_id, message } = req.body;
+
+    const ticket = await getTicket(ticket_id);
+    if (!ticket) {
+      return res.status(ERROR.dataNotFound.statusCode).json(ERROR.dataNotFound);
+    }
+    const objectToInsert = {
+      ticket_id: ticket_id,
+      replied_by_admin: false,
+      message: message,
+    };
+
+
+    const [added, reply] = await Promise.all([
+      addReply(objectToInsert),
+      updateData(
+        { id: ticket_id },
+        { status: 'pending' }
+      )
+    ])
+
+    if (reply && added) {
+      let finalMessage = { ...SUCCESS.created };
+      finalMessage.message = "Reply posted successfully";
+      return res.status(SUCCESS.created.statusCode).json(finalMessage);
+    } else {
+      return res.status(ERROR.error.statusCode).json(ERROR.error);
+    }
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
 
 export const getTickets = async (req, res) => {
   try {

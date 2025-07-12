@@ -22,6 +22,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          sudo rm -rf backend-yoexstaking/server/db/database.js
+          cp /var/www/html/database.js backend-yoexstaking/server/db/
           cd /var/www/html/backend-yoexstaking
           npm install
 

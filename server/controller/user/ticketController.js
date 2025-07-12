@@ -19,7 +19,7 @@ export const getViewSinglePost = async (req, res) => {
     const replies = await getReplies(ticket_id);
 
     const finalRsult = {
-      ticket: ticket[0],
+      ticket: ticket,
       replies: replies,
     }
     let finalMessage = { ...SUCCESS.found };

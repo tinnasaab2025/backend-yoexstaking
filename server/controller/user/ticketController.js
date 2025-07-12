@@ -31,7 +31,6 @@ export const getViewSinglePost = async (req, res) => {
   }
 };
 
-
 export const postReply = async (req, res) => {
   try {
     const { ticket_id, message } = req.body;

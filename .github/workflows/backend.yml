@@ -18,11 +18,11 @@ jobs:
 
       - name: Copy Latest Code from GitHub to Server
         run: |
-          rsync -avh --exclude='.git' ./ /var/www/html/api.yoexstaking.io
+          rsync -avh --exclude='.git' ./ /var/www/html/backend-yoexstaking
 
       - name: Install Dependencies
         run: |
-          cd /var/www/html/api.yoexstaking.io
+          cd /var/www/html/backend-yoexstaking
           npm install
 
       - name: Restart Application with PM2

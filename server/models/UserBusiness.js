@@ -13,6 +13,9 @@ export const UserBusiness = sequelize.define('UserBusiness', {
     allowNull: false,
     index: true
   },
+  unstake_allowance: {
+    type: DataTypes.INTEGER,
+  },
   sponser_id: {
     type: DataTypes.STRING,
   },

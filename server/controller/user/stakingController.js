@@ -1,5 +1,7 @@
 "use strict";
 import Web3 from "web3";
+import { Sequelize } from 'sequelize';
+
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
 import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
 import { getOne as getOneUser } from "../../service/userService.js";
@@ -9,15 +11,16 @@ import {
 } from "../../service/userBusinessService.js";
 
 import { getOne } from "../../service/configrationService.js";
-import { getFindAllWithCount } from "../../service/stakeGHistoryService.js";
-import { getFindAllWithCount as getFindAllWithCountBond } from "../../service/bondHistoryService.js";
+import { getFindAllWithCount, getData as getDataStakeHistory } from "../../service/stakeGHistoryService.js";
+import { getFindAllWithCount as getFindAllWithCountBond, getData as getDataBondHistory } from "../../service/bondHistoryService.js";
 
 import {
   getOne as getOneUnStake,
   getFindAllWithCount as getFindAllWithCountUnStake,
   InsertData as InsertDataUnStake,
+  getData as getDataUnStakeHistory,
 } from "../../service/unstakeHistoryService.js";
-import { getFindAllWithCount as getFindAllWithCountUnBond } from "../../service/unBondHistoryService.js";
+import { getFindAllWithCount as getFindAllWithCountUnBond, getData as getDataUnbondIncomeHistory } from "../../service/unBondHistoryService.js";
 import {
   getLimitRecordsExcludeType,
   InsertData as inseretDataAsset,
@@ -403,10 +406,18 @@ export const stakeHistory = async (req, res) => {
     let criteria = {
       user_id: user_id,
     };
-    const list = await getFindAllWithCount(criteria, start, limits);
+    const attributeMinting = [
+      [Sequelize.fn('SUM', Sequelize.col('usdt_amount')), 'amount'],
+    ]
+    const [list, totalAms] = await Promise.all([
+      getFindAllWithCount(criteria, start, limits),
+      getDataStakeHistory(criteria, attributeMinting),
+    ]);
+
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "Stake getting successfully";
     finalMessage.data = list;
+    finalMessage.totalAmount = totalAms;
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);
@@ -435,10 +446,19 @@ export const bondIncomeHistory = async (req, res) => {
     let criteria = {
       user_id: user_id,
     };
-    const list = await getFindAllWithCountBond(criteria, start, limits);
+
+    const attributeMinting = [
+      [Sequelize.fn('SUM', Sequelize.col('amount')), 'amount'],
+    ]
+    const [list, total_minting_amount] = await Promise.all([
+      getFindAllWithCountBond(criteria, start, limits),
+      getDataBondHistory(criteria, attributeMinting)
+    ]);
+
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "Bond getting successfully";
     finalMessage.data = list;
+    finalMessage.totalAmount = total_minting_amount;
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);
@@ -467,10 +487,18 @@ export const unbondIncomeHistory = async (req, res) => {
     let criteria = {
       user_id: user_id,
     };
-    const list = await getFindAllWithCountUnBond(criteria, start, limits);
+    const attributeMinting = [
+      [Sequelize.fn('SUM', Sequelize.col('amount')), 'amount'],
+    ]
+    const [list, total_minting_amount] = await Promise.all([
+      getFindAllWithCountUnBond(criteria, start, limits),
+      getDataUnbondIncomeHistory(criteria, attributeMinting)
+    ]);
+
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "UnStake getting successfully";
     finalMessage.data = list;
+    finalMessage.totalAmount = total_minting_amount;
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);
@@ -497,10 +525,17 @@ export const unStakeHistory = async (req, res) => {
     let criteria = {
       user_id: user_id,
     };
-    const list = await getFindAllWithCountUnStake(criteria, start, limits);
+    const attributeMinting = [
+      [Sequelize.fn('SUM', Sequelize.col('tokens')), 'amount'],
+    ]
+    const [list, totalAms] = await Promise.all([
+      getFindAllWithCountUnStake(criteria, start, limits),
+      getDataUnStakeHistory(criteria, attributeMinting)
+    ]);
     let finalMessage = { ...SUCCESS.found };
     finalMessage.message = "UnBond getting successfully";
     finalMessage.data = list;
+    finalMessage.totalAmount = totalAms;
     return res.status(SUCCESS.found.statusCode).json(finalMessage);
   } catch (error) {
     handleErrorMessage(res, error);

@@ -10,6 +10,7 @@ export const getFindAllWithCount = async (criteria, offset, limit) => {
         where: criteria,
         offset: offset,
         limit: limit,
+        order: [['created_at', 'DESC']],
     });
     return {
         count,

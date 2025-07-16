@@ -6,6 +6,7 @@ import {
   checkTra,
   checkTransaction,
   unbond,
+  getPopupStatus,
 
 } from "../../controller/authController.js";
 import express from "express";
@@ -36,6 +37,7 @@ router.get(`${baseURLPublic}checkhash`, checkTra);
 router.get(`${baseURLPublic}checktransaction`, checkTransaction);
 
 router.post(`${baseURL}removeStake`, removeStake);
+router.get(`${baseURLPublic}getPopupStatus`, getPopupStatus);
 
 
 // router.post(`${baseURL}checkValidationForSignup`, signupValidation2,checkRegister);

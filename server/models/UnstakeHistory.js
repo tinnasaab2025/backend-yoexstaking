@@ -11,6 +11,9 @@ export const UnstakeHistory = sequelize.define('UnstakeHistory', {
         type: DataTypes.STRING(30),
         allowNull: false
     },
+    amount: {
+        type: DataTypes.DECIMAL(10, 2),
+    },
     wallet_address: {
         type: DataTypes.TEXT,
         allowNull: true

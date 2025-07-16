@@ -4,6 +4,7 @@ import Web3 from "web3";
 import { ERROR, SUCCESS } from "../config/AppConstants.js";
 import jwt from "jsonwebtoken";
 import { getOne, InsertData } from "../service/userService.js";
+import { getOne as getOneConfi } from "../service/configrationService.js";
 import {
   getOne as getOneBond,
   InsertData as InsertDataBond,
@@ -257,8 +258,8 @@ export const checkTransaction = async (req, res) => {
 
 export const unbond = async (req, res) => {
   try {
-     const { hash } = req.body;
-     const {user_id} = req.user;
+    const { hash } = req.body;
+    const { user_id } = req.user;
 
     const getUnBond = await getUnOneBond({ hash: hash }, ["id"]);
     if (getUnBond) {
@@ -320,10 +321,10 @@ export const unbond = async (req, res) => {
     }
 
     const [getUser, tokenPrice] = await Promise.all([
-      getOne({ user_id: user_id }, ["user_id","eth_address"]),
+      getOne({ user_id: user_id }, ["user_id", "eth_address"]),
       getOneTokenPrice({ id: 1 }, ["amount"]),
     ]);
-// console.warn(getUser, tokenPrice);
+    // console.warn(getUser, tokenPrice);
     if (getUser.eth_address.toLowerCase() !== decodedData.user.toLowerCase()) {
       return res.status(403).json({
         statusCode: 403,
@@ -357,7 +358,7 @@ export const unbond = async (req, res) => {
 
     if (inseretDataUnBond) {
       await updateBondData(
-        { user_id: user_id,unbond_id: parseInt(decodedData.index) || 0 },
+        { user_id: user_id, unbond_id: parseInt(decodedData.index) || 0 },
         { status: 1 }
       );
     }
@@ -455,6 +456,28 @@ export const walletExist = async (req, res) => {
       .json(ERROR.somethingWentWrong);
   }
 };
+
+
+export const getPopupStatus = async (req, res) => {
+  try {
+
+    let criteria = {
+      setting_key: 'popup_enabled',
+    };
+
+    const attribute = {
+      include: ["setting_value"],
+    };
+    const data = await getOneConfi(criteria, attribute);
+    let finalResponse = { ...SUCCESS.found };
+    finalResponse.message = "Success";
+    finalResponse.data = data;
+    return res.status(SUCCESS.found.statusCode).json(finalResponse);
+
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+}
 
 function createToken(object) {
   let token = jwt.sign(object, "thisisSecret");

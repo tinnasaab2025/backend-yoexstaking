@@ -94,6 +94,36 @@ export const assets = async (req, res) => {
     handleErrorMessage(res, error);
   }
 };
+
+export const getUserStakeStatus = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+    let criteria = {
+      user_id: user_id,
+    };
+    const attribute = ["disabled"];
+    const user = await getOne(criteria, attribute);
+    if (user["disabled"] === true) {
+      let finalResponse = { ...ERROR.error };
+      finalResponse.message = "User blocked, please contact our support";
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+    
+    const attribute2 = [ "unstake_allowance"];
+
+    const userInfo = await getOneUserBusiness(criteria, attribute2)
+    const response = {};
+    response["stakeStatus"] = userInfo["unstake_allowance"];;
+    let finalMessage = { ...SUCCESS.found };
+    finalMessage.message = "User Stake status getting successfully";
+    finalMessage.data = response;
+    return res.status(SUCCESS.found.statusCode).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+}
+
+
 export const userInfo = async (req, res) => {
   try {
     const { user_id, wallet_address } = req.user;
@@ -108,17 +138,17 @@ export const userInfo = async (req, res) => {
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
 
-    const total_directs = await count({ sponser_id: user_id });
-    const total_team = await sponsorCount({ user_id: user_id });
-    const token_price = await getOneTokenValue({ id: 1 }, ["amount"]);
-
-    const totalBond = await getTotalBondSumByUserId(user_id);
-    const totalStake = await getTotalStakeSumByUserId(user_id);
-
-    const blockBontyReward = await getOneRankAchiver(
-      { user_id: wallet_address },
-      ["rank_name"]
-    );
+    const [total_directs, total_team, token_price, totalBond, totalStake, blockBontyReward] = await Promise.all([
+      count({ sponser_id: user_id }),
+      sponsorCount({ user_id: user_id }),
+      getOneTokenValue({ id: 1 }, ["amount"]),
+      getTotalBondSumByUserId(user_id),
+      getTotalStakeSumByUserId(user_id),
+      getOneRankAchiver(
+        { user_id: wallet_address },
+        ["rank_name"]
+      )
+    ]);
     let response = {};
     if (blockBontyReward) {
       response["rank_level"] = true;

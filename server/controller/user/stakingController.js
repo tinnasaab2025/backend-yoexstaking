@@ -1,6 +1,6 @@
 "use strict";
 import Web3 from "web3";
-import { Sequelize } from 'sequelize';
+import { Sequelize,Op } from 'sequelize';
 
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
 import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
@@ -255,10 +255,26 @@ const callThirdPartyAPI = async (object2) => {
   const data = await response.json();
   return data;
 };
+const lastWithdrawalTimes = {};
 export const signTransaction = async (req, res) => {
   try {
     const { user_id } = req.user;
     const { total_amount, amount, amount_usdt } = req.body;
+    let currentTime = new Date();
+    let lastWithdrawalTime;
+    let twoMinutesLater;
+
+    if (lastWithdrawalTimes[user_id]) {
+      const lastWithdrawalTime = new Date(lastWithdrawalTimes[user_id]);
+      const twoMinutesLater = new Date(lastWithdrawalTime.getTime() + 1 * 60 * 1000);
+
+      if (currentTime < twoMinutesLater) {
+        let finalResponse = { ...ERROR.error };
+        finalResponse.message = "Please wait for 1 minutes before making another confirm request!";
+        return res.status(ERROR.error.statusCode).json(finalResponse);
+      }
+    }
+
     const user = await getOneUser({ user_id: user_id }, [
       "disabled",
       "eth_address",
@@ -268,6 +284,24 @@ export const signTransaction = async (req, res) => {
       finalResponse.message = "User blocked, please contact our support";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
+
+    if (amount <= 0 || total_amount <= 0 || amount_usdt <= 0) {
+      let finalResponse = { ...ERROR.error };
+      finalResponse.message = "Invalid amount, please try again!";
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+
+
+    const checkSignatureStatus = await getOneSignature(
+      { wallet_address: user.eth_address, status: 0, id: { [Op.gt]: 5331 } },
+      ["id"]
+    );
+    if (checkSignatureStatus) {
+      let finalResponse = { ...ERROR.error };
+      finalResponse.message = "Signature Generation in progress, please wait!";
+      return res.status(ERROR.error.statusCode).json(finalResponse);
+    }
+
     const object = {
       user_id: user_id,
       wallet_address: user.eth_address, // Assuming eth_address is the wallet address
@@ -323,7 +357,7 @@ export const signTransaction = async (req, res) => {
         );
         const objectToInsert = {
           user_id: user_id,
-          amount: -amount,
+          amount: -Math.abs(amount), // ensures always negative         
           type: "unstake_signature",
           description: "Unstake Signature",
           remark: response.signature,

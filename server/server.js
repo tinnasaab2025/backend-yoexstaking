@@ -1,5 +1,6 @@
-import createError from "http-errors";
 import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import cors from "cors";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -14,6 +15,21 @@ import { ERROR } from "./config/AppConstants.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 var app = express();
+app.set('trust proxy', 'loopback'); // Or use a specific IP or subnet
+// 🛡️ Create rate limiter middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
+  legacyHeaders: false, // Disable `X-RateLimit-*` headers
+});
+
+// ⛑️ Apply limiter to all routes
+app.use(helmet());
+app.use(limiter);
+
+
 
 // view engine setup
 // app.set("views", path.join(__dirname, "views"));
@@ -24,6 +40,7 @@ let whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://yoexstaking.com",
+  "https://yoexstaking.io",
   "https://vg-there-gis-invasion.trycloudflare.com"
 ];
 

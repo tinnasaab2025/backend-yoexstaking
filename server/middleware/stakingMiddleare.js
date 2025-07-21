@@ -3,11 +3,11 @@ import { ERROR } from "../config/AppConstants.js";
 
 export const signValidation = async (req, res, next) => {
   try {
-    const schema = Joi.object({
-      total_amount: Joi.number().required(),
-      amount: Joi.number().required(),
-      amount_usdt: Joi.number().required(),
-    });
+   const schema = Joi.object({
+  total_amount: Joi.number().strict().required(),
+  amount: Joi.number().strict().required(),
+  amount_usdt: Joi.number().strict().required(),
+}).unknown(false); // This will **reject** any unknown keys
 
     const validation = schema.validate(req.body);
     if (validation.error !== undefined) {

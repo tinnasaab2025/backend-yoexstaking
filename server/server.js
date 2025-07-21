@@ -17,17 +17,17 @@ const __dirname = path.dirname(__filename);
 var app = express();
 app.set('trust proxy', 'loopback'); // Or use a specific IP or subnet
 // 🛡️ Create rate limiter middleware
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later.",
-  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
-  legacyHeaders: false, // Disable `X-RateLimit-*` headers
-});
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 100, // Limit each IP to 100 requests per windowMs
+//   message: "Too many requests from this IP, please try again later.",
+//   standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
+//   legacyHeaders: false, // Disable `X-RateLimit-*` headers
+// });
 
 // ⛑️ Apply limiter to all routes
 app.use(helmet());
-app.use(limiter);
+// app.use(limiter);
 
 
 

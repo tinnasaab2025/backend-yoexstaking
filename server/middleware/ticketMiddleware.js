@@ -11,7 +11,9 @@ export const createTicketValidation = async (req, res, next) => {
       description: Joi.string().required().trim(),
     });
     const { user_id } = req.user;
-    const checkTicket = await getOne({ user_id: user_id }, ['status']);
+    const checkTicket = await getOne({ user_id: user_id,status: {
+      [Op.in]: ['open', 'pending']
+    } }, ['status']);
     if (checkTicket) {
       const ticketStatus = checkTicket.status;
       console.log('ticketStatus:', ticketStatus);

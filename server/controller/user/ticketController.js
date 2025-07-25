@@ -1,6 +1,6 @@
 "use strict";
 import { ERROR, SUCCESS } from "../../config/AppConstants.js";
-import { InsertData, updateData } from "../../service/ticketService.js";
+import { InsertData, updateData,getOne } from "../../service/ticketService.js";
 import { getData } from "../../service/topicService.js";
 import { addReply, getReplies, getTicket, getUserTickets } from "../../utils/GetTickets.js";
 import { handleErrorMessage } from "../../utils/UniversalFunctions.js";
@@ -107,9 +107,18 @@ export const createTicket = async (req, res) => {
     obj.subject = subject;
     obj.description = description;
 
+    const checkTicket = await getOne({user_id: user_id}, ['status']);
+    const ticketStatus = checkTicket?.status;
+    if (ticketStatus === 'open' || ticketStatus === 'pending') {
+      let finalMessage = { ...ERROR.error };
+      finalMessage.message = "You already have an open ticket.";
+      return res.status(ERROR.error.statusCode).json(finalMessage);
+    }
+
     const result = await InsertData(obj);
     if (result) {
       let finalMessage = { ...SUCCESS.created };
+      finalMessage.message = "Thank you for your request. We have received your enquiry and will resolve it within 24 hours.";
       return res.status(SUCCESS.created.statusCode).json(finalMessage);
     } else {
       return res.status(ERROR.error.statusCode).json(ERROR.error);

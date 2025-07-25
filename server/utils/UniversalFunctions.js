@@ -5,13 +5,12 @@ import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 import { ERROR, SUCCESS } from "../config/AppConstants.js";
 import { getOne } from "../service/userService.js";
-import { sequelize } from '../db/database.js';
 
 
 cloudinary.config({
-  cloud_name: "test",
-  api_key: "api_key",
-  api_secret: "api_secret",
+  cloud_name: "dw0simsid",
+  api_key: "787745312822318",
+  api_secret: "OpPr6N6I3CNeIg1vwCKhFJvH0Hk",
 });
 
 const currentDate = new Date();
@@ -50,21 +49,6 @@ export const calculatePercentage = (percent, amount) => {
 };
 
 
-export const db_acquire_lock = async (key) => {
-  const [result] = await sequelize.query(`SELECT GET_LOCK(:key, 0) AS acquired`, {
-    replacements: { key },
-    type: sequelize.QueryTypes.SELECT,
-  });
-  return result.acquired === 1;
-};
-
-export const db_release_lock = async (key) => {
-  await sequelize.query(`SELECT RELEASE_LOCK(:key)`, {
-    replacements: { key },
-    type: sequelize.QueryTypes.SELECT,
-  });
-};
-
 export const getWeekday = () => {
   const currentDay = currentDate.getDay();
   return currentDay;
@@ -85,12 +69,14 @@ export const getRandomNumber = () => {
 
 export const uploadFilesWithCloudinary = async (document) => {
   try {
-    let ImageDate = await cloudinary.uploader.upload(
+    let result = await cloudinary.uploader.upload(
       document,
       { resource_type: "image" },
-      function (error, result) { }
+      function (error, result) { 
+         return null;
+      }
     );
-    return ImageDate.secure_url;
+    return result.secure_url;
   } catch (err) {
     throw err;
   }

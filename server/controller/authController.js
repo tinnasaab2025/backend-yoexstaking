@@ -12,6 +12,11 @@ import {
 } from "../service/bondHistoryService.js";
 
 import {
+  getFindAllWithCount as getFindAllWithCountReward,
+} from "../service/rewardListService.js";
+
+
+import {
   getOne as getUnOneBond,
   InsertData as InsertUnDataBond,
   updateData as updateUnDataBond,
@@ -27,6 +32,7 @@ import {
   generateUniqueUserId,
   getRandomNumber,
   handleErrorMessage,
+  handleSuccess,
 } from "../utils/UniversalFunctions.js";
 import { getTransactionDetails } from "../utils/web3.js";
 import { token } from "morgan";
@@ -173,6 +179,19 @@ export const checkTra = async (req, res) => {
 
     await InsertDataBond(object);
     return res.status(200).json(finalMessage);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
+
+export const rewardList = async (req, res) => {
+  try {
+    const { skip, limit } = req.query;
+    let criteria = {
+      status: 1, // or any other criteria you need
+    };
+    const list = await getFindAllWithCountReward(criteria, parseInt(skip), parseInt(limit));
+    handleSuccess(res, list);
   } catch (error) {
     handleErrorMessage(res, error);
   }

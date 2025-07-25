@@ -1,6 +1,6 @@
 
 import express from "express";
-import { assets, bondTerms, eventAchiver, getUserStakeStatus, inviteHistoryTeam, joinMalasiyaEvent, luckyUsers, overview, userInfo } from "../../controller/user/profileController.js";
+import { assets, bondTerms, eventAchiver, getUserStakeStatus, inviteHistoryTeam, joinMalasiyaEvent, luckyUsers, luckyUsersDubai, overview, userInfo } from "../../controller/user/profileController.js";
 import { joinMalasiyaEventValidation } from "../../middleware/profileMiddleware.js";
 
 const router = express.Router();
@@ -17,6 +17,8 @@ router.get(`${baseURL}invite_history_team`,inviteHistoryTeam)
 
 router.get(`${baseURL}event_achiver`, eventAchiver);
 router.get(`${baseURL}lucky-users`, luckyUsers);
+router.get(`${baseURL}lucky-users-dubai`, luckyUsersDubai);
+
 router.post(`${baseURL}event/join_malaysia`,joinMalasiyaEventValidation, joinMalasiyaEvent);
 
 

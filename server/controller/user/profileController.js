@@ -488,7 +488,7 @@ export const eventAchiver = async (req, res) => {
     if (currentDate.getDate() >= 1 && currentDate.getMonth() + 1 >= 8) {
       ams = 3000;
     }
-    if (totalBond >= ams) {
+    if (totalBond >= ams && currentDate.getDate() >= 1 && currentDate.getMonth() + 1 >= 8) {
       let finalMessage = { ...SUCCESS.found };
       finalMessage.message = "Token is valid. User is authenticated.";
       finalMessage.data = {

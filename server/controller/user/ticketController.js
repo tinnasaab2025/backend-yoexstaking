@@ -107,7 +107,9 @@ export const createTicket = async (req, res) => {
     obj.subject = subject;
     obj.description = description;
 
-    const checkTicket = await getOne({ user_id: user_id }, ['status']);
+    const checkTicket = await getOne({ user_id: user_id,status: {
+      [Op.in]: ['open', 'pending']
+    } }, ['status']);
     if (checkTicket) {
       const ticketStatus = checkTicket?.status;
       console.log('ticketStatus:', ticketStatus);

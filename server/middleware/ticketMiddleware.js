@@ -1,5 +1,7 @@
 import Joi from "joi";
 import { ERROR } from "../config/AppConstants.js";
+import { getOne } from "../service/ticketService.js";
+
 
 export const createTicketValidation = async (req, res, next) => {
   try {
@@ -8,8 +10,19 @@ export const createTicketValidation = async (req, res, next) => {
       subject: Joi.string().required().trim(),
       description: Joi.string().required().trim(),
     });
-   
-   
+    const { user_id } = req.user;
+    const checkTicket = await getOne({ user_id: user_id }, ['status']);
+    if (checkTicket) {
+      const ticketStatus = checkTicket.status;
+      console.log('ticketStatus:', ticketStatus);
+      if (ticketStatus === 'open' || ticketStatus === 'pending') {
+        let finalMessage = { ...ERROR.error };
+        finalMessage.message = "You already have an open ticket.";
+        return res.status(ERROR.error.statusCode).json(finalMessage);
+      }
+    }
+
+
     const validation = schema.validate(req.body);
     if (validation.error !== undefined) {
       let finalMessage = {};
@@ -30,8 +43,8 @@ export const postReplyValidation = async (req, res, next) => {
       ticket_id: Joi.number().required(),
       message: Joi.string().required().trim(),
     });
-   
-   
+
+
     const validation = schema.validate(req.body);
     if (validation.error !== undefined) {
       let finalMessage = {};

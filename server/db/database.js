@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize';
 
 // ✅ Assign the instance to a variable
-export const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.env.PASSWORD, {
-  host: process.env.HOST,
+export const sequelize = new Sequelize('yoex', 'root', 'your_secure_password', {
+  host: 'localhost',
   port: 3306, // or 3307 if your XAMPP uses that
   dialect: 'mysql',
   logging: false,

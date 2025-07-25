@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { Op } from "sequelize";
 import { ERROR } from "../config/AppConstants.js";
 import { getOne } from "../service/ticketService.js";
 

@@ -20,7 +20,7 @@ import {
   getData as getDataAssets,
 } from "../../service/assetsService.js";
 
-import { getData as getOneProfile } from "../../service/userProfileService.js";
+import { getOne as getOneProfile } from "../../service/userProfileService.js";
 import {
   getData,
   getSum as getSumBondHistory,

@@ -19,6 +19,8 @@ import {
   getSum,
   getData as getDataAssets,
 } from "../../service/assetsService.js";
+
+import { getData as getOneProfile } from "../../service/userProfileService.js";
 import {
   getData,
   getSum as getSumBondHistory,
@@ -108,8 +110,8 @@ export const getUserStakeStatus = async (req, res) => {
       finalResponse.message = "User blocked, please contact our support";
       return res.status(ERROR.error.statusCode).json(finalResponse);
     }
-    
-    const attribute2 = [ "unstake_allowance"];
+
+    const attribute2 = ["unstake_allowance"];
 
     const userInfo = await getOneUserBusiness(criteria, attribute2)
     const response = {};
@@ -481,7 +483,12 @@ export const eventAchiver = async (req, res) => {
 
     const totalBond = bondData ? bondData : 0;
 
-    if (totalBond >= 1500) {
+    const currentDate = new Date();
+    let ams = 1500;
+    if (currentDate.getDate() >= 1 && currentDate.getMonth() + 1 >= 8) {
+      ams = 3000;
+    }
+    if (totalBond >= ams) {
       let finalMessage = { ...SUCCESS.found };
       finalMessage.message = "Token is valid. User is authenticated.";
       finalMessage.data = {
@@ -505,6 +512,35 @@ export const luckyUsers = async (req, res) => {
     const { wallet_address } = req.user;
 
     const event = await getOneEvent({ wallet_address }, ["status"]);
+
+    if (!event) {
+      return getResponse(res, 3, "Join Now", "Pending");
+    }
+
+    const status = event.status;
+
+    const statusMap = {
+      0: { text: "Pending", message: "Pending" },
+      1: { text: "Approve", message: "Pending" },
+      2: { text: "Reject", message: "Complete" },
+    };
+
+    const { text, message } = statusMap[status] || {
+      text: "New User",
+      message: "Complete",
+    };
+
+    return getResponse(res, status ?? 3, text, message);
+  } catch (error) {
+    handleErrorMessage(res, error);
+  }
+};
+
+export const luckyUsersDubai = async (req, res) => {
+  try {
+    const { user_id } = req.user;
+
+    const event = await getOneProfile({ user_id: user_id }, ["status"]);
 
     if (!event) {
       return getResponse(res, 3, "Join Now", "Pending");

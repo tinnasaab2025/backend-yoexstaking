@@ -41,6 +41,7 @@ let whitelist = [
   "http://localhost:3001",
   "https://yoexstaking.com",
   "https://yoexstaking.io",
+  "https://yoex.pro",
   "https://vg-there-gis-invasion.trycloudflare.com"
 ];
 

@@ -43,6 +43,7 @@ let whitelist = [
   "https://yoexstaking.io",
   "https://yoex.pro",
   "https://yoex.org",
+  "https://yoex.uk",
   "https://vg-there-gis-invasion.trycloudflare.com"
 ];
 

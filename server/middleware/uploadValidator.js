@@ -60,10 +60,7 @@ const uploadSchema = Joi.object({
         .pattern(/[A-Z]{5}[0-9]{4}[A-Z]{1}/)
         .required()
         .messages({ 'string.pattern.base': 'Invalid PAN format' }),
-    passport_number: Joi.string()
-        .pattern(/^[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]$/)
-        .required()
-        .messages({ 'string.pattern.base': 'Invalid passport number' }),
+    passport_number: Joi.string().trim().required(),
     date_of_issue: Joi.date().required(),
     date_of_expiry: Joi.date().greater(Joi.ref('date_of_issue')).required(),
 });

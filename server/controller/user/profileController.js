@@ -478,17 +478,15 @@ export const eventAchiver = async (req, res) => {
       where: {
         user_id: user_id,
         lock_days: { [Op.gte]: 180 },
+        id: { [Op.gte]: 3055 }
       },
     });
 
     const totalBond = bondData ? bondData : 0;
 
-    const currentDate = new Date();
-    let ams = 1500;
-    if (currentDate.getDate() >= 1 && currentDate.getMonth() + 1 >= 8) {
-      ams = 3000;
-    }
-    if (totalBond >= ams && currentDate.getDate() >= 1 && currentDate.getMonth() + 1 >= 8) {
+    
+    const  ams = 3000;
+    if (totalBond >= ams) {
       let finalMessage = { ...SUCCESS.found };
       finalMessage.message = "Token is valid. User is authenticated.";
       finalMessage.data = {

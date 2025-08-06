@@ -12,6 +12,10 @@ export const UserProfileData = sequelize.define(
     user_id: {
       type: DataTypes.STRING,
     },
+    wallet_address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     country: {
       type: DataTypes.STRING,
     },

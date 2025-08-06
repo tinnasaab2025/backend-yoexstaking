@@ -43,7 +43,7 @@ const checkIfUploadAllowed = async (req, res, next) => {
 router.post('/api/v1/upload', checkIfUploadAllowed,upload.fields(fields),uploadValidator, async (req, res) => {
     try {
         const { country, region, first_name, last_name, email, number, pan_number, passport_number, date_of_issue, date_of_expiry } = req.body;
-        const { user_id } = req.user;
+        const { user_id,wallet_address } = req.user;
         const imageUrls = {};
         let criteria = {
             user_id: user_id,
@@ -97,6 +97,7 @@ router.post('/api/v1/upload', checkIfUploadAllowed,upload.fields(fields),uploadV
         } else {
             ress = await InsertData({
                 user_id: user_id,
+                wallet_address: wallet_address,
                 country: country,
                 region: region,
                 first_name: first_name,
